@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retro NES Emulator</title>
+    <title>Retro Rewind</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
@@ -13,46 +13,58 @@
             color: #e0e0e0;
             overflow-x: hidden;
         }
-        .tv-container {
+        /* Main container for the top section (TV and Console) */
+        .game-station {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            width: 100%;
+        }
+        @media (min-width: 1024px) { /* lg breakpoint */
+            .game-station {
+                flex-direction: row;
+                align-items: flex-end;
+                justify-content: center;
+            }
+        }
+
+        .tv-wrapper {
+            background-image: url('https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/TV/Frame.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
             position: relative;
             width: 90vw;
             max-width: 800px;
-            margin: 2rem auto;
-            background: #333;
-            border: 20px solid #282828;
-            border-radius: 2rem;
-            box-shadow: 0 0 50px rgba(0,0,0,0.7), inset 0 0 20px rgba(0,0,0,0.8);
-            padding: 2.5rem;
+            aspect-ratio: 512 / 448; 
+            flex-shrink: 0;
         }
         .screen-container {
-            position: relative;
-            width: 100%;
-            padding-top: 75%; /* 4:3 Aspect Ratio */
+            position: absolute;
             background: #000;
-            border-radius: 0.5rem;
-            box-shadow: inset 0 0 15px rgba(0,0,0,0.9);
             overflow: hidden;
+            top: 9.5%;
+            left: 12.5%;
+            width: 75%;
+            height: 65%;
         }
         #nes-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
             image-rendering: pixelated;
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
         }
-        .static-overlay {
+        #screen-overlay {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('https://i.giphy.com/media/l2JIm1br3ewcfx0cM/giphy.gif');
-            opacity: 0.08;
-            pointer-events: none;
-            display: none; /* Initially hidden */
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
         }
         .tv-reflection {
             position: absolute;
@@ -60,135 +72,109 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 10%);
+            background: linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 15%);
             pointer-events: none;
-            border-radius: 0.5rem;
         }
-        .nes-console {
-            background-color: #c0c0c0;
-            border: 2px solid #a0a0a0;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-        }
-        .nes-console .top {
-            background-color: #e0e0e0;
-            border-bottom: 2px solid #a0a0a0;
-            border-radius: 6px 6px 0 0;
-        }
-        .nes-console .cartridge-slot-container {
-            background-color: #444;
-            border: 2px solid #333;
-        }
-        .nes-console .cartridge-slot {
-            background-color: #222;
-        }
-        .nes-console .power-light {
-            width: 12px;
-            height: 12px;
+        .power-light {
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background-color: #660000;
-            border: 1px solid #ff0000;
-            box-shadow: 0 0 5px #ff0000;
+            border: 2px solid #ff0000;
+            box-shadow: 0 0 5px rgba(255, 0, 0, 0.5);
             transition: all 0.3s;
         }
-        .nes-console .power-light.on {
+        .power-light.on {
             background-color: #ff0000;
             box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000;
         }
-        .cartridge {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        .cartridge-wrapper {
+            transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out;
             cursor: pointer;
         }
-        .cartridge:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px #facc15; /* yellow-400 */
+        .cartridge-wrapper:hover {
+            transform: translateY(-5px) scale(1.05);
+            filter: drop-shadow(0 0 15px #facc15);
         }
-        #controls-info {
-            max-width: 800px;
+        .game-cover {
+            /* Positioning for vertical cover art on the cartridge */
+            position: absolute;
+            width: 78%;
+            height: 55%;
+            top: 10%;
+            left: 11%;
+            object-fit: contain;
+            pointer-events: none;
+            image-rendering: pixelated;
         }
     </style>
 </head>
-<body class="bg-gray-900 flex flex-col items-center justify-center min-h-screen p-4">
+<body class="bg-gray-900 flex flex-col items-center min-h-screen p-4">
 
-    <header class="text-center mb-8">
-        <h1 class="text-3xl md:text-5xl font-bold text-yellow-400 tracking-wider">RETRO GAMING RIG</h1>
-        <p class="text-gray-400 mt-2">Click a cartridge to play</p>
+    <header class="text-center mb-6">
+        <h1 class="text-4xl md:text-5xl font-bold text-yellow-400 tracking-wider">Retro Rewind</h1>
+        <p class="text-gray-400 mt-2">Click a cartridge to power up the system!</p>
     </header>
 
-    <main class="w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-8">
-        <!-- TV and Emulator -->
-        <div class="tv-container">
-            <div class="screen-container">
-                <canvas id="nes-screen"></canvas>
-                <div id="static-overlay" class="static-overlay"></div>
-                <div class="tv-reflection"></div>
-            </div>
-            <div class="flex justify-between items-center mt-4 px-2">
-                <div class="text-lg font-bold text-gray-400">CHANNEL <span class="text-white">03</span></div>
-                <div class="w-16 h-8 bg-black rounded-sm"></div>
-            </div>
-        </div>
-
-        <!-- NES Console -->
-        <div class="nes-console w-full max-w-sm p-4 mt-8 lg:mt-24">
-            <div class="top p-2">
-                <div class="flex items-center justify-between">
-                    <img src="https://raw.githubusercontent.com/google/material-design-icons/master/png/device/nintendo-switch/materialicons/48dp/1x/baseline_nintendo_switch_black_48dp.png" alt="NES Logo" class="h-8 opacity-75" onerror="this.style.display='none'">
-                    <span class="text-xs text-gray-600 font-sans">NINTENDO ENTERTAINMENT SYSTEM</span>
+    <main class="w-full max-w-7xl mx-auto">
+        <div class="game-station">
+            <!-- TV and Emulator -->
+            <div class="tv-wrapper">
+                <div class="screen-container">
+                    <canvas id="nes-screen" width="256" height="240"></canvas>
+                    <div id="screen-overlay"></div>
+                    <div class="tv-reflection"></div>
                 </div>
             </div>
-            <div class="middle p-4">
-                <div class="flex items-center gap-4">
+
+            <!-- NES Console -->
+            <div id="console-area" class="w-full max-w-xs md:max-w-sm lg:max-w-xs flex-shrink-0">
+                <img src="https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Console/NES.png" alt="NES Console" class="w-full h-auto">
+                <div class="flex items-center gap-4 p-4 justify-center mt-[-10px]">
                     <div class="power-light" id="power-light"></div>
-                    <div class="flex gap-2">
-                        <button class="px-3 py-1 bg-gray-700 text-white text-xs rounded shadow-inner">POWER</button>
-                        <button class="px-3 py-1 bg-gray-500 text-gray-800 text-xs rounded shadow-inner">RESET</button>
-                    </div>
-                </div>
-                <div class="cartridge-slot-container mt-4 p-2 rounded">
-                    <div class="cartridge-slot h-12 flex items-center justify-center text-gray-500 text-xs rounded">
-                        INSERT CARTRIDGE
-                    </div>
+                    <div class="text-gray-400 font-sans text-sm">POWER</div>
                 </div>
             </div>
         </div>
+
+        <!-- Game Cartridge Selection -->
+        <section id="game-selection" class="w-full mt-12 p-4">
+            <h2 class="text-2xl text-center mb-6 border-b-2 border-gray-700 pb-2">Game Library</h2>
+            <div id="cartridge-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
+                <!-- Cartridges will be injected here by JavaScript -->
+            </div>
+        </section>
+
+        <!-- Controls Info -->
+        <section id="controls-info" class="text-center mt-12 p-4 bg-gray-800/50 rounded-lg border border-gray-700 w-full">
+            <h3 class="text-xl mb-4">Controls</h3>
+            <img src="https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/ControllerDiagrams/Color/DiagramText.png" alt="Controller Diagram" class="mx-auto mb-4 max-w-full h-auto px-4" style="max-width: 400px;">
+            <p class="mt-4 text-xs text-gray-400">Keyboard: Arrows, X (A), Z (B), Enter (Start), Shift (Select). Gamepad also supported.</p>
+        </section>
     </main>
-
-    <!-- Game Cartridge Selection -->
-    <section id="game-selection" class="w-full max-w-4xl mt-12 p-4">
-        <h2 class="text-2xl text-center mb-6">Game Library</h2>
-        <div id="cartridge-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 md:gap-6">
-            <!-- Cartridges will be injected here by JavaScript -->
-        </div>
-    </section>
-
-    <!-- Controls Info -->
-    <section id="controls-info" class="text-center mt-12 p-4 bg-gray-800 rounded-lg border border-gray-700 w-full">
-        <h3 class="text-xl mb-4">Controls</h3>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-            <div><p class="font-bold text-yellow-400">A Button:</p><p>X</p></div>
-            <div><p class="font-bold text-yellow-400">B Button:</p><p>Z</p></div>
-            <div><p class="font-bold text-yellow-400">Start:</p><p>Enter</p></div>
-            <div><p class="font-bold text-yellow-400">Select:</p><p>Shift</p></div>
-            <div class="col-span-2 md:col-span-4"><p class="font-bold text-yellow-400">D-Pad:</p><p>Arrow Keys</p></div>
-        </div>
-        <p class="mt-4 text-xs text-gray-400">Gamepad support is also enabled!</p>
-    </section>
     
-    <footer class="text-center text-gray-500 text-xs mt-8 pb-4">
-        <p>JSNES Emulator by <a href="https://github.com/bfirsh/jsnes" target="_blank" class="text-yellow-500 hover:underline">bfirsh</a>. This is a non-commercial project for demonstration purposes.</p>
-        <p class="mt-1">NOTE: Game files (ROMs) are not hosted here. Please replace placeholder URLs with your actual file paths.</p>
+    <footer class="text-center text-gray-500 text-sm mt-8 pb-4">
+        <p>SkyeDev &lt;3</p>
     </footer>
+
+    <!-- Error Modal -->
+    <div id="error-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-center max-w-sm mx-4 border border-red-500">
+            <h3 class="text-xl text-red-500 mb-4">Loading Error</h3>
+            <p id="error-message" class="text-gray-300 mb-6"></p>
+            <button id="close-modal-btn" class="bg-yellow-500 text-gray-900 px-6 py-2 rounded font-bold hover:bg-yellow-400 transition-colors">OK</button>
+        </div>
+    </div>
 
     <!-- JSNES Library -->
     <script src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // --- CONFIGURATION ---
-            // IMPORTANT: Replace these with your actual GitHub project paths.
-            const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/user/project/main/'; // Replace 'user/project'
-            const ROM_FOLDER = GITHUB_BASE_URL + 'games/';
-            const COVER_FOLDER = GITHUB_BASE_URL + 'covers/';
+            const GITHUB_BASE_URL = 'https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/';
+            const ASSET_FOLDER = GITHUB_BASE_URL + 'assets/';
+            const ROM_FOLDER = ASSET_FOLDER + 'games/';
+            const COVER_FOLDER = ASSET_FOLDER + 'covers/';
 
             const games = [
                 { id: 'super_mario_bros', name: 'Super Mario Bros.', rom: 'smb.nes' },
@@ -201,116 +187,148 @@
             // --- DOM ELEMENTS ---
             const cartridgeContainer = document.getElementById('cartridge-container');
             const canvas = document.getElementById('nes-screen');
-            const staticOverlay = document.getElementById('static-overlay');
+            const screenOverlay = document.getElementById('screen-overlay');
             const powerLight = document.getElementById('power-light');
+            const errorModal = document.getElementById('error-modal');
+            const errorMessage = document.getElementById('error-message');
+            const closeModalBtn = document.getElementById('close-modal-btn');
 
             let nes;
+            let frameTimer;
 
             // --- INITIALIZATION ---
             function initialize() {
                 populateCartridges();
-                showStatic(true);
+                setScreenOverlay(ASSET_FOLDER + 'Splash/NES.png');
+                closeModalBtn.addEventListener('click', () => errorModal.classList.add('hidden'));
             }
 
             // --- UI FUNCTIONS ---
             function populateCartridges() {
                 games.forEach(game => {
                     const coverUrl = `${COVER_FOLDER}${game.id}.jpg`;
-                    const placeholderUrl = `https://placehold.co/200x280/333333/FFFFFF?text=${game.name.replace(/\s/g, '+')}`;
+                    const placeholderUrl = `https://placehold.co/112x154/222222/FFFFFF?text=${encodeURIComponent(game.name)}`;
+                    const cartFrontUrl = ASSET_FOLDER + 'Cartridge/Front.png';
                     
                     const cartElement = document.createElement('div');
-                    cartElement.className = 'cartridge bg-gray-700 rounded-lg overflow-hidden shadow-lg';
+                    cartElement.className = 'cartridge-wrapper relative';
                     cartElement.innerHTML = `
+                        <img src="${cartFrontUrl}" alt="NES Cartridge" class="w-full h-auto block drop-shadow-lg">
                         <img src="${coverUrl}" 
                              alt="${game.name}" 
-                             class="w-full h-auto object-cover"
+                             class="game-cover"
                              onerror="this.onerror=null;this.src='${placeholderUrl}';">
-                        <p class="text-center text-xs p-2 truncate">${game.name}</p>
+                        <div class="absolute bottom-0 w-full p-2 bg-black/60 pointer-events-none">
+                            <p class="text-center text-xs truncate">${game.name}</p>
+                        </div>
                     `;
                     cartElement.addEventListener('click', () => loadGame(game));
                     cartridgeContainer.appendChild(cartElement);
                 });
             }
 
-            function showStatic(isStatic) {
-                staticOverlay.style.display = isStatic ? 'block' : 'none';
-                if(isStatic) {
+            function setScreenOverlay(imageUrl) {
+                if (imageUrl) {
+                    screenOverlay.style.backgroundImage = `url('${imageUrl}')`;
+                    screenOverlay.style.display = 'block';
                     powerLight.classList.remove('on');
                 } else {
+                    screenOverlay.style.display = 'none';
                     powerLight.classList.add('on');
                 }
             }
             
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorModal.classList.remove('hidden');
+            }
+
             // --- EMULATOR LOGIC ---
             function loadGame(game) {
                 const romUrl = ROM_FOLDER + game.rom;
                 console.log(`Loading game: ${game.name} from ${romUrl}`);
-                showStatic(true);
+                setScreenOverlay(ASSET_FOLDER + 'Splash/Nintendo.png'); // Show splash while loading
                 
                 // Stop any existing emulation
-                if (nes && nes.ui) {
-                     nes.ui.stop();
+                if (frameTimer) {
+                    clearInterval(frameTimer);
+                }
+                if (nes) {
+                    nes.stop();
                 }
 
-                // Fetch the ROM
                 fetch(romUrl)
                     .then(response => {
                         if (!response.ok) {
-                            throw new Error(`Network response was not ok: ${response.statusText}. Could not load ROM. Make sure the GitHub URL and file paths are correct.`);
+                            throw new Error(`Network response was not ok: ${response.statusText}. Could not find ROM file. Make sure the GitHub URL and file paths are correct.`);
                         }
                         return response.arrayBuffer();
                     })
                     .then(arrayBuffer => {
-                        const romData = new Uint8Array(arrayBuffer);
-                        startGame(romData);
+                        startGame(new Uint8Array(arrayBuffer));
                     })
                     .catch(error => {
                         console.error('Error loading the ROM:', error);
-                        alert(`Failed to load ${game.name}. Please check the console for errors and verify your ROM paths.`);
+                        showError(`Failed to load ${game.name}. Please check the console for errors and verify your ROM paths.`);
+                        setScreenOverlay(ASSET_FOLDER + 'Splash/NES.png');
                     });
             }
 
             function startGame(romData) {
-                showStatic(false);
+                setScreenOverlay(null); // Hide overlay, turn on power light
                 
+                const context = canvas.getContext('2d');
+                const imageData = context.createImageData(256, 240);
+                
+                // Create a buffer for faster rendering
+                const buffer = new ArrayBuffer(imageData.data.length);
+                const a32 = new Uint32Array(buffer); // 32-bit view of buffer
+                const u8 = new Uint8ClampedArray(buffer); // 8-bit view of buffer
+
                 nes = new jsnes.NES({
                     onFrame: (frameBuffer) => {
-                        const context = canvas.getContext('2d');
-                        const imageData = context.createImageData(256, 240);
+                        // This is a much faster way to render the frame than a JS loop
                         for (let i = 0; i < frameBuffer.length; i++) {
-                            imageData.data[i] = frameBuffer[i];
+                            a32[i] = 0xFF000000 | frameBuffer[i]; // Set alpha to 255 and copy BGR color
                         }
+                        imageData.data.set(u8);
                         context.putImageData(imageData, 0, 0);
                     },
                 });
 
                 nes.loadROM(romData);
                 
+                // Start emulation loop
+                frameTimer = setInterval(() => {
+                    nes.frame();
+                }, 1000 / 60);
+                
                 // Keyboard controls
                 const onKey = (isDown, event) => {
+                    if (!nes) return;
                     const player = 1;
-                    switch (event.keyCode) {
-                        case 38: nes.buttonDown(player, jsnes.Controller.BUTTON_UP); break; // Up
-                        case 40: nes.buttonDown(player, jsnes.Controller.BUTTON_DOWN); break; // Down
-                        case 37: nes.buttonDown(player, jsnes.Controller.BUTTON_LEFT); break; // Left
-                        case 39: nes.buttonDown(player, jsnes.Controller.BUTTON_RIGHT); break; // Right
-                        case 88: nes.buttonDown(player, jsnes.Controller.BUTTON_A); break; // 'x' -> A
-                        case 90: nes.buttonDown(player, jsnes.Controller.BUTTON_B); break; // 'z' -> B
-                        case 16: nes.buttonDown(player, jsnes.Controller.BUTTON_SELECT); break; // Shift -> Select
-                        case 13: nes.buttonDown(player, jsnes.Controller.BUTTON_START); break; // Enter -> Start
-                        default: return;
+                    const button = {
+                        38: jsnes.Controller.BUTTON_UP,     // Up
+                        40: jsnes.Controller.BUTTON_DOWN,   // Down
+                        37: jsnes.Controller.BUTTON_LEFT,   // Left
+                        39: jsnes.Controller.BUTTON_RIGHT,  // Right
+                        88: jsnes.Controller.BUTTON_A,      // 'x' -> A
+                        90: jsnes.Controller.BUTTON_B,      // 'z' -> B
+                        16: jsnes.Controller.BUTTON_SELECT, // Shift -> Select
+                        13: jsnes.Controller.BUTTON_START   // Enter -> Start
+                    }[event.keyCode];
+
+                    if (button !== undefined) {
+                        if (isDown) nes.buttonDown(player, button);
+                        else nes.buttonUp(player, button);
+                        event.preventDefault();
                     }
-                    event.preventDefault();
                 };
 
                 document.addEventListener('keydown', (event) => onKey(true, event));
                 document.addEventListener('keyup', (event) => onKey(false, event));
                 
-                // Start the emulation loop
-                nes.start();
-                
-                // Scroll to the TV
-                canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                document.querySelector('.tv-wrapper').scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
 
             // --- RUN ---
