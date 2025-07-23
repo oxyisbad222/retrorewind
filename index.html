@@ -221,19 +221,19 @@
         <!-- N64 TAB -->
         <div id="n64-tab" class="tab-content">
             <div class="game-station">
-                <div class="tv-wrapper">
-                    <div class="screen-container">
-                        <canvas id="n64-screen" width="640" height="480" style="background:#000"></canvas>
-                        <div id="n64-screen-overlay" style="background-image: url('https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Splash/N64.png');"></div>
-                    </div>
+            <div class="tv-wrapper">
+                <div class="screen-container">
+                    <canvas id="n64-screen" width="640" height="480" style="background:#000"></canvas>
+                    <div id="n64-screen-overlay" style="background-image: url('https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Splash/N64.png');"></div>
                 </div>
-                <div id="n64-console-area" class="w-full max-w-xs md:max-w-sm lg:max-w-xs flex-shrink-0 mt-8 lg:mt-0">
-                    <img src="https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Console/N64.png" alt="N64 Console" class="w-full h-auto">
-                    <div class="flex items-center gap-4 p-4 justify-center mt-[-10px]">
-                        <div class="power-light" id="n64-power-light"></div>
-                        <div class="text-gray-400 font-sans text-sm">POWER</div>
-                    </div>
+            </div>
+            <div id="n64-console-area" class="w-full max-w-xs md:max-w-sm lg:max-w-xs flex-shrink-0 mt-8 lg:mt-0">
+                <img src="https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Console/N64.png" alt="N64 Console" class="w-full h-auto">
+                <div class="flex items-center gap-4 p-4 justify-center mt-[-10px]">
+                    <div class="power-light" id="n64-power-light"></div>
+                    <div class="text-gray-400 font-sans text-sm">POWER</div>
                 </div>
+            </div>
             </div>
             <section class="w-full mt-12 p-4">
                 <div class="flex justify-between items-center mb-6 border-b-2 border-gray-700 pb-2">
@@ -244,6 +244,299 @@
                     <span class="inline-block bg-sky-900 text-sky-300 px-4 py-2 rounded shadow">Select a cartridge to power on the N64!</span>
                 </div>
             </section>
+
+            <!-- Improved N64 On-screen Controller for Mobile -->
+            <style>
+            @media (max-width: 1024px) {
+                #mobile-controller-n64 {
+                    display: flex !important;
+                    flex-direction: column;
+                    align-items: center;
+                    justify-content: flex-end;
+                    height: 260px;
+                    padding-bottom: 10px;
+                    background: linear-gradient(180deg, rgba(30,41,59,0.95) 60%, rgba(0,0,0,0.95) 100%);
+                    box-shadow: 0 -4px 32px #000a;
+                }
+                .n64-touch-layout {
+                    width: 100%;
+                    max-width: 500px;
+                    margin: 0 auto;
+                    display: flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: flex-end;
+                    height: 100%;
+                    position: relative;
+                }
+                .n64-dpad-area {
+                    width: 120px;
+                    height: 120px;
+                    position: relative;
+                    margin-left: 10px;
+                }
+                .n64-dpad-btn {
+                    position: absolute;
+                    background: linear-gradient(145deg, #334155 60%, #64748b 100%);
+                    border: 2px solid #0ea5e9;
+                    border-radius: 12px;
+                    width: 38px;
+                    height: 38px;
+                    opacity: 0.92;
+                    box-shadow: 0 2px 8px #0ea5e9aa;
+                    transition: background 0.15s, box-shadow 0.15s;
+                    z-index: 2;
+                }
+                .n64-dpad-btn.active {
+                    background: #38bdf8;
+                    box-shadow: 0 0 16px #38bdf8, 0 0 32px #0ea5e9;
+                    opacity: 1;
+                }
+                .n64-dpad-up    { top: 0; left: 41px; }
+                .n64-dpad-down  { bottom: 0; left: 41px; }
+                .n64-dpad-left  { left: 0; top: 41px; }
+                .n64-dpad-right { right: 0; top: 41px; }
+
+                .n64-face-area {
+                    display: flex;
+                    flex-direction: column;
+                    align-items: flex-end;
+                    justify-content: flex-end;
+                    margin-right: 10px;
+                    gap: 12px;
+                }
+                .n64-face-row {
+                    display: flex;
+                    flex-direction: row;
+                    gap: 18px;
+                    margin-bottom: 0;
+                }
+                .n64-btn {
+                    width: 54px;
+                    height: 54px;
+                    border-radius: 50%;
+                    background: linear-gradient(145deg, #0ea5e9 60%, #38bdf8 100%);
+                    border: 2px solid #facc15;
+                    color: #fff;
+                    font-size: 1.1rem;
+                    font-family: 'Press Start 2P', cursive;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 2px 12px #facc15aa;
+                    opacity: 0.95;
+                    transition: background 0.15s, box-shadow 0.15s;
+                    z-index: 2;
+                }
+                .n64-btn.active {
+                    background: #facc15;
+                    color: #222;
+                    box-shadow: 0 0 24px #facc15, 0 0 48px #facc15;
+                    opacity: 1;
+                }
+                .n64-c-btn {
+                    background: linear-gradient(145deg, #facc15 60%, #fde047 100%);
+                    border: 2px solid #eab308;
+                    color: #222;
+                    font-size: 1rem;
+                    box-shadow: 0 2px 12px #facc15aa;
+                }
+                .n64-c-btn.active {
+                    background: #fde047;
+                    color: #222;
+                    box-shadow: 0 0 24px #fde047, 0 0 48px #facc15;
+                }
+                .n64-start-btn, .n64-z-btn {
+                    width: 70px;
+                    height: 28px;
+                    border-radius: 14px;
+                    background: linear-gradient(90deg, #64748b 60%, #334155 100%);
+                    border: 2px solid #0ea5e9;
+                    color: #fff;
+                    font-size: 0.9rem;
+                    font-family: 'Press Start 2P', cursive;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin: 0 6px;
+                    box-shadow: 0 2px 8px #0ea5e9aa;
+                    opacity: 0.92;
+                    transition: background 0.15s, box-shadow 0.15s;
+                }
+                .n64-start-btn.active, .n64-z-btn.active {
+                    background: #38bdf8;
+                    color: #222;
+                    box-shadow: 0 0 16px #38bdf8, 0 0 32px #0ea5e9;
+                    opacity: 1;
+                }
+                .n64-analog-area {
+                    position: absolute;
+                    left: 50%;
+                    bottom: 18px;
+                    transform: translateX(-50%);
+                    z-index: 1;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                }
+                .n64-analog-stick {
+                    width: 64px;
+                    height: 64px;
+                    background: radial-gradient(circle at 60% 40%, #64748b 60%, #334155 100%);
+                    border-radius: 50%;
+                    border: 2px solid #0ea5e9;
+                    box-shadow: 0 2px 12px #0ea5e9aa;
+                    position: relative;
+                    touch-action: none;
+                    opacity: 0.93;
+                }
+                .n64-analog-dot {
+                    width: 28px;
+                    height: 28px;
+                    background: #38bdf8;
+                    border-radius: 50%;
+                    position: absolute;
+                    left: 18px;
+                    top: 18px;
+                    box-shadow: 0 0 12px #38bdf8;
+                    pointer-events: none;
+                    transition: left 0.08s, top 0.08s;
+                }
+            }
+            </style>
+            <div id="mobile-controller-n64" class="lg:hidden" style="display:none;">
+                <div class="n64-touch-layout">
+                    <!-- D-Pad -->
+                    <div class="n64-dpad-area">
+                        <div id="n64-dpad-up"    data-key="ArrowUp"    class="n64-dpad-btn n64-dpad-up"></div>
+                        <div id="n64-dpad-down"  data-key="ArrowDown"  class="n64-dpad-btn n64-dpad-down"></div>
+                        <div id="n64-dpad-left"  data-key="ArrowLeft"  class="n64-dpad-btn n64-dpad-left"></div>
+                        <div id="n64-dpad-right" data-key="ArrowRight" class="n64-dpad-btn n64-dpad-right"></div>
+                    </div>
+                    <!-- Analog Stick -->
+                    <div class="n64-analog-area">
+                        <div class="n64-analog-stick" id="n64-analog-stick">
+                            <div class="n64-analog-dot" id="n64-analog-dot"></div>
+                        </div>
+                    </div>
+                    <!-- Face Buttons -->
+                    <div class="n64-face-area">
+                        <div class="n64-face-row">
+                            <div data-key="KeyA" class="n64-btn" id="n64-btn-a">A</div>
+                            <div data-key="KeyB" class="n64-btn" id="n64-btn-b">B</div>
+                        </div>
+                        <div class="n64-face-row">
+                            <div data-key="KeyCUp"    class="n64-btn n64-c-btn" id="n64-btn-cup">C↑</div>
+                            <div data-key="KeyCRight" class="n64-btn n64-c-btn" id="n64-btn-cright">C→</div>
+                            <div data-key="KeyCDown"  class="n64-btn n64-c-btn" id="n64-btn-cdown">C↓</div>
+                            <div data-key="KeyCLeft"  class="n64-btn n64-c-btn" id="n64-btn-cleft">C←</div>
+                        </div>
+                        <div class="n64-face-row">
+                            <div data-key="Enter" class="n64-start-btn" id="n64-btn-start">START</div>
+                            <div data-key="KeyZ" class="n64-z-btn" id="n64-btn-z">Z</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script>
+            (function() {
+                // Touch logic for N64 controller
+                const N64_KEY_MAP = {
+                    'ArrowUp': 'DPAD_UP',
+                    'ArrowDown': 'DPAD_DOWN',
+                    'ArrowLeft': 'DPAD_LEFT',
+                    'ArrowRight': 'DPAD_RIGHT',
+                    'KeyA': 'A',
+                    'KeyB': 'B',
+                    'KeyCUp': 'C_UP',
+                    'KeyCDown': 'C_DOWN',
+                    'KeyCLeft': 'C_LEFT',
+                    'KeyCRight': 'C_RIGHT',
+                    'Enter': 'START',
+                    'KeyZ': 'Z'
+                };
+                // Touch D-Pad and Buttons
+                document.querySelectorAll('#mobile-controller-n64 .n64-dpad-btn, #mobile-controller-n64 .n64-btn, #mobile-controller-n64 .n64-start-btn, #mobile-controller-n64 .n64-z-btn').forEach(btn => {
+                    const key = btn.dataset.key;
+                    const getKey = () => {
+                        // Map C buttons
+                        if (key === 'KeyCUp') return 'C_UP';
+                        if (key === 'KeyCDown') return 'C_DOWN';
+                        if (key === 'KeyCLeft') return 'C_LEFT';
+                        if (key === 'KeyCRight') return 'C_RIGHT';
+                        return N64_KEY_MAP[key] || key;
+                    };
+                    const handle = (isDown, e) => {
+                        e.preventDefault();
+                        btn.classList.toggle('active', isDown);
+                        if (window.RetroRewind && RetroRewind.n64IsPoweredOn && RetroRewind.n64Module) {
+                            RetroRewind.n64Module.setButton(0, getKey(), isDown);
+                        }
+                    };
+                    btn.addEventListener('touchstart', e => handle(true, e), { passive: false });
+                    btn.addEventListener('touchend', e => handle(false, e), { passive: false });
+                    btn.addEventListener('touchcancel', e => handle(false, e), { passive: false });
+                });
+
+                // Analog stick logic
+                const analog = document.getElementById('n64-analog-stick');
+                const dot = document.getElementById('n64-analog-dot');
+                let dragging = false, startX = 0, startY = 0, centerX = 0, centerY = 0;
+                let analogX = 0, analogY = 0;
+                const maxDist = 24; // px, max from center
+                function setAnalog(x, y) {
+                    analogX = Math.max(-1, Math.min(1, x));
+                    analogY = Math.max(-1, Math.min(1, y));
+                    // Move dot visually
+                    dot.style.left = (18 + analogX * maxDist) + 'px';
+                    dot.style.top = (18 + analogY * maxDist) + 'px';
+                    // Send to emulator
+                    if (window.RetroRewind && RetroRewind.n64IsPoweredOn && RetroRewind.n64Module) {
+                        // Map -1..1 to -80..80 (N64 stick range)
+                        RetroRewind.n64Module.setAnalog(0, Math.round(analogX * 80), Math.round(analogY * 80));
+                    }
+                }
+                function resetAnalog() { setAnalog(0, 0); }
+                analog.addEventListener('touchstart', function(e) {
+                    e.preventDefault();
+                    dragging = true;
+                    const rect = analog.getBoundingClientRect();
+                    centerX = rect.left + rect.width / 2;
+                    centerY = rect.top + rect.height / 2;
+                    const touch = e.touches[0];
+                    moveAnalog(touch.clientX, touch.clientY);
+                }, { passive: false });
+                analog.addEventListener('touchmove', function(e) {
+                    if (!dragging) return;
+                    e.preventDefault();
+                    const touch = e.touches[0];
+                    moveAnalog(touch.clientX, touch.clientY);
+                }, { passive: false });
+                analog.addEventListener('touchend', function(e) {
+                    dragging = false;
+                    resetAnalog();
+                }, { passive: false });
+                analog.addEventListener('touchcancel', function(e) {
+                    dragging = false;
+                    resetAnalog();
+                }, { passive: false });
+                function moveAnalog(x, y) {
+                    const dx = x - centerX;
+                    const dy = y - centerY;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    let nx = dx / maxDist;
+                    let ny = dy / maxDist;
+                    if (dist > maxDist) {
+                        nx = nx / Math.abs(nx) * 1;
+                        ny = ny / Math.abs(ny) * 1;
+                    }
+                    setAnalog(Math.max(-1, Math.min(1, nx)), Math.max(-1, Math.min(1, ny)));
+                }
+                // Reset analog on load
+                resetAnalog();
+            })();
+            </script>
+            </section>
         </div>
 
         <!-- CREDITS TAB -->
@@ -252,7 +545,7 @@
                 <img src="assets/skyedev.jpg" alt="SkyeDev <3" class="credits-img">
                 <div class="credits-title text-center">Retro Rewind by SkyeDev &lt;3</div>
                 <div class="credits-list">
-                    <span>Lead Developer &amp; Design</span>
+                    <span>Lead Developer &amp; Design: Skye</span>
                     <span>Assets: Community</span>
                     <span>NES Emulation: JSNES</span>
                     <span>N64 Emulation: N64Wasm (by nbarkhina)</span>
