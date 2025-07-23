@@ -43,6 +43,16 @@
             image-rendering: -moz-crisp-edges;
             image-rendering: crisp-edges;
         }
+        #screen-overlay, #n64-screen-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            z-index: 3;
+            pointer-events: none;
+        }
         .screen-container::before {
             content: '';
             position: absolute;
@@ -65,39 +75,41 @@
             border: 2px solid transparent; border-radius: 8px; cursor: pointer;
             background: transparent;
         }
-        .cartridge-wrapper:hover, .n64-cartridge-wrapper:hover { transform: translateY(-5px) scale(1.05); filter: drop-shadow(0 0 15px #facc15); }
-        .cartridge-wrapper.selected, .n64-cartridge-wrapper.selected { border-color: #facc15; box-shadow: 0 0 20px #facc15; transform: translateY(-5px) scale(1.05); }
+        .cartridge-wrapper:hover, .n64-cartridge-wrapper:hover { transform: translateY(-5px) scale(1.05); filter: drop-shadow(0 0 15px #38bdf8); }
+        .cartridge-wrapper.selected, .n64-cartridge-wrapper.selected { border-color: #38bdf8; box-shadow: 0 0 20px #38bdf8; transform: translateY(-5px) scale(1.05); }
         .game-cover, .n64-game-cover { position: absolute; width: 78%; height: 55%; top: 10%; left: 11%; object-fit: contain; pointer-events: none; image-rendering: pixelated; }
         .n64-game-cover { width: 70%; height: 45%; top: 15%; left: 15%; }
         .n64-cartridge-wrapper { position: relative; }
         .n64-cartridge-label { position: absolute; bottom: 0; width: 100%; padding: 0.5rem 0; background: rgba(0,0,0,0.7); font-size: 0.7rem; text-align: center; pointer-events: none; }
 
-        /* On-screen controller styles (unchanged) */
-        #mobile-controller {
-            background-image: url('https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Controller/NESTemplate.png');
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
+        /* On-screen controller styles */
+        #mobile-controller, #mobile-controller-n64 {
+            background: rgba(0,0,0,0.7);
             position: fixed;
             bottom: 0;
             left: 0; right: 0; width: 100%;
-            height: 200px;
+            height: 220px;
             z-index: 100;
             display: none;
+            user-select: none;
         }
-        body.controller-enabled.game-active .lg\\:hidden#mobile-controller { display: block; }
+        body.controller-enabled.nes-active .lg\:hidden#mobile-controller { display: block; }
+        body.controller-enabled.n64-active .lg\:hidden#mobile-controller-n64 { display: block; }
         .controller-layout { width: 100%; height: 100%; display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; }
         .d-pad { position: relative; width: 120px; height: 120px; }
         .face-buttons { display: flex; gap: 20px; align-items: center; }
         .system-buttons { position: absolute; bottom: 35%; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
         .touch-button { position: absolute; background: rgba(255, 255, 255, 0.1); -webkit-tap-highlight-color: rgba(255,255,255,0.5); }
-        .touch-button.active { background: rgba(255, 255, 255, 0.4); }
-        #dpad-up { top: 0; left: 33.33%; width: 33.33%; height: 33.33%; border-radius: 5px 5px 0 0; }
-        #dpad-down { bottom: 0; left: 33.33%; width: 33.33%; height: 33.33%; border-radius: 0 0 5px 5px; }
-        #dpad-left { top: 33.33%; left: 0; width: 33.33%; height: 33.33%; border-radius: 5px 0 0 5px; }
-        #dpad-right { top: 33.33%; right: 0; width: 33.33%; height: 33.33%; border-radius: 0 5px 5px 0; }
-        .b-button, .a-button { width: 50px; height: 50px; border-radius: 50%; }
-        .select-button, .start-button { width: 50px; height: 20px; border-radius: 10px; }
+        .touch-button.active { background: rgba(56, 189, 248, 0.4); }
+        #dpad-up, #n64-dpad-up { top: 0; left: 33.33%; width: 33.33%; height: 33.33%; border-radius: 5px 5px 0 0; }
+        #dpad-down, #n64-dpad-down { bottom: 0; left: 33.33%; width: 33.33%; height: 33.33%; border-radius: 0 0 5px 5px; }
+        #dpad-left, #n64-dpad-left { top: 33.33%; left: 0; width: 33.33%; height: 33.33%; border-radius: 5px 0 0 5px; }
+        #dpad-right, #n64-dpad-right { top: 33.33%; right: 0; width: 33.33%; height: 33.33%; border-radius: 0 5px 5px 0; }
+        .b-button, .a-button, .n64-b-button, .n64-a-button, .n64-c-button { width: 50px; height: 50px; border-radius: 50%; }
+        .select-button, .start-button, .n64-start-button, .n64-z-button { width: 50px; height: 20px; border-radius: 10px; }
+        .n64-c-button { background: #facc15; }
+        .n64-trigger { width: 60px; height: 30px; border-radius: 15px; background: #38bdf8; position: absolute; top: 0; right: 0; }
+        .n64-trigger.active { background: #0ea5e9; }
 
         /* Credits Gamification */
         .credits-bg {
@@ -110,7 +122,7 @@
         }
         .credits-img {
             border-radius: 1rem;
-            box-shadow: 0 0 30px #facc15, 0 0 0 8px #fff inset;
+            box-shadow: 0 0 30px #38bdf8, 0 0 0 8px #fff inset;
             margin: 0 auto 1.5rem auto;
             display: block;
             width: 220px;
@@ -118,18 +130,18 @@
         }
         .credits-img:hover {
             transform: scale(1.05) rotate(-2deg);
-            box-shadow: 0 0 60px #facc15, 0 0 0 12px #fff inset;
+            box-shadow: 0 0 60px #38bdf8, 0 0 0 12px #fff inset;
         }
         .credits-title {
             font-size: 2rem;
-            color: #facc15;
-            text-shadow: 0 0 8px #fff, 0 0 16px #facc15;
+            color: #38bdf8;
+            text-shadow: 0 0 8px #fff, 0 0 16px #38bdf8;
             margin-bottom: 1rem;
             animation: creditsPulse 2s infinite;
         }
         @keyframes creditsPulse {
-            0%,100% { text-shadow: 0 0 8px #fff, 0 0 16px #facc15; }
-            50% { text-shadow: 0 0 16px #fff, 0 0 32px #facc15; }
+            0%,100% { text-shadow: 0 0 8px #fff, 0 0 16px #38bdf8; }
+            50% { text-shadow: 0 0 16px #fff, 0 0 32px #38bdf8; }
         }
         .credits-list {
             display: flex; flex-direction: column; gap: 0.5rem;
@@ -146,7 +158,7 @@
             transition: background 0.2s;
         }
         .credits-list span:hover {
-            background: #facc15;
+            background: #38bdf8;
             color: #222;
         }
         .credits-heart {
@@ -173,7 +185,7 @@
     <!-- Tabs -->
     <nav class="flex justify-center gap-2 mb-8">
         <button class="tab-btn px-4 py-2 rounded-l active" data-tab="nes-tab">NES</button>
-        <button class="tab-btn px-4 py-2" data-tab="n64-tab">N64 (WIP)</button>
+        <button class="tab-btn px-4 py-2" data-tab="n64-tab">N64</button>
         <button class="tab-btn px-4 py-2 rounded-r" data-tab="credits-tab">Credits</button>
     </nav>
 
@@ -211,25 +223,25 @@
             <div class="game-station">
                 <div class="tv-wrapper">
                     <div class="screen-container">
-                        <canvas id="n64-screen" width="320" height="240" style="background:#000"></canvas>
+                        <canvas id="n64-screen" width="640" height="480" style="background:#000"></canvas>
                         <div id="n64-screen-overlay" style="background-image: url('https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Splash/N64.png');"></div>
                     </div>
                 </div>
                 <div id="n64-console-area" class="w-full max-w-xs md:max-w-sm lg:max-w-xs flex-shrink-0 mt-8 lg:mt-0">
                     <img src="https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Console/N64.png" alt="N64 Console" class="w-full h-auto">
                     <div class="flex items-center gap-4 p-4 justify-center mt-[-10px]">
-                        <div class="power-light"></div>
+                        <div class="power-light" id="n64-power-light"></div>
                         <div class="text-gray-400 font-sans text-sm">POWER</div>
                     </div>
                 </div>
             </div>
             <section class="w-full mt-12 p-4">
                 <div class="flex justify-between items-center mb-6 border-b-2 border-gray-700 pb-2">
-                    <h2 class="text-2xl">N64 Game Library <span class="text-yellow-400 text-xs ml-2">(Work In Progress)</span></h2>
+                    <h2 class="text-2xl">N64 Game Library <span class="text-sky-400 text-xs ml-2">(Beta)</span></h2>
                 </div>
                 <div id="n64-cartridge-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8"></div>
-                <div class="mt-8 text-center text-gray-400 text-lg">
-                    <span class="inline-block bg-yellow-900 text-yellow-300 px-4 py-2 rounded shadow">N64 emulation coming soon!<br>Games will load as .z64 files from the games folder.</span>
+                <div class="mt-8 text-center text-gray-400 text-lg" id="n64-status">
+                    <span class="inline-block bg-sky-900 text-sky-300 px-4 py-2 rounded shadow">Select a cartridge to power on the N64!</span>
                 </div>
             </section>
         </div>
@@ -237,14 +249,13 @@
         <!-- CREDITS TAB -->
         <div id="credits-tab" class="tab-content">
             <div class="credits-bg max-w-lg mx-auto mt-8 mb-12">
-                <img src="https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/credits/skye.jpg" alt="SkyeDev <3" class="credits-img">
+                <img src="assets/skyedev.jpg" alt="SkyeDev <3" class="credits-img">
                 <div class="credits-title text-center">Retro Rewind by SkyeDev &lt;3</div>
                 <div class="credits-list">
-                    <span>Lead Developer: SkyeDev</span>
-                    <span>Design: SkyeDev</span>
-                    <span>Assets: SkyeDev &amp; Community</span>
+                    <span>Lead Developer &amp; Design</span>
+                    <span>Assets: Community</span>
                     <span>NES Emulation: JSNES</span>
-                    <span>N64 Emulation: N64JS (WIP)</span>
+                    <span>N64 Emulation: N64Wasm (by nbarkhina)</span>
                 </div>
                 <div class="text-center text-gray-300">
                     <p>Thank you for playing!<br>Enjoy the nostalgia and rewind time.</p>
@@ -256,17 +267,42 @@
     
     <footer class="text-center text-gray-500 text-sm mt-8 pb-4">SkyeDev &lt;3</footer>
 
+    <!-- NES On-screen Controller -->
     <div id="mobile-controller" class="lg:hidden">
-        <div class="controller-layout">
-            <div class="d-pad"></div>
-                <div id="dpad-up" data-key="38" class="touch-button"></div><div id="dpad-down" data-key="40" class="touch-button"></div>
-                <div id="dpad-left" data-key="37" class="touch-button"></div><div id="dpad-right" data-key="39" class="touch-button"></div>
+        <div class="controller-layout" style="position:relative;">
+            <div class="d-pad" style="position:relative;">
+                <div id="dpad-up" data-key="38" class="touch-button"></div>
+                <div id="dpad-down" data-key="40" class="touch-button"></div>
+                <div id="dpad-left" data-key="37" class="touch-button"></div>
+                <div id="dpad-right" data-key="39" class="touch-button"></div>
             </div>
-            <div class="system-buttons">
-                <div data-key="16" class="touch-button select-button"></div><div data-key="13" class="touch-button start-button"></div>
+            <div class="system-buttons" style="position:absolute;bottom:35%;left:50%;transform:translateX(-50%);display:flex;gap:15px;">
+                <div data-key="16" class="touch-button select-button"></div>
+                <div data-key="13" class="touch-button start-button"></div>
             </div>
-            <div class="face-buttons">
-                <div data-key="90" class="touch-button b-button"></div><div data-key="88" class="touch-button a-button"></div>
+            <div class="face-buttons" style="position:relative;">
+                <div data-key="90" class="touch-button b-button"></div>
+                <div data-key="88" class="touch-button a-button"></div>
+            </div>
+        </div>
+    </div>
+    <!-- N64 On-screen Controller -->
+    <div id="mobile-controller-n64" class="lg:hidden">
+        <div class="controller-layout" style="position:relative;">
+            <div class="d-pad" style="position:relative;">
+                <div id="n64-dpad-up" data-key="ArrowUp" class="touch-button"></div>
+                <div id="n64-dpad-down" data-key="ArrowDown" class="touch-button"></div>
+                <div id="n64-dpad-left" data-key="ArrowLeft" class="touch-button"></div>
+                <div id="n64-dpad-right" data-key="ArrowRight" class="touch-button"></div>
+            </div>
+            <div class="system-buttons" style="position:absolute;bottom:35%;left:50%;transform:translateX(-50%);display:flex;gap:15px;">
+                <div data-key="Enter" class="touch-button n64-start-button"></div>
+                <div data-key="KeyZ" class="touch-button n64-z-button"></div>
+            </div>
+            <div class="face-buttons" style="position:relative;">
+                <div data-key="KeyB" class="touch-button n64-b-button"></div>
+                <div data-key="KeyA" class="touch-button n64-a-button"></div>
+                <div data-key="KeyC" class="touch-button n64-c-button"></div>
             </div>
         </div>
     </div>
@@ -275,11 +311,13 @@
         <div class="bg-gray-800 p-8 rounded-lg shadow-lg text-center max-w-sm mx-4 border border-red-500">
             <h3 class="text-xl text-red-500 mb-4">Loading Error</h3>
             <p id="error-message" class="text-gray-300 mb-6"></p>
-            <button id="close-modal-btn" class="bg-yellow-500 text-gray-900 px-6 py-2 rounded font-bold hover:bg-yellow-400 transition-colors">OK</button>
+            <button id="close-modal-btn" class="bg-sky-500 text-gray-900 px-6 py-2 rounded font-bold hover:bg-sky-400 transition-colors">OK</button>
         </div>
     </div>
 
     <script src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
+    <!-- N64Wasm loader (by nbarkhina) -->
+    <script src="https://cdn.jsdelivr.net/npm/n64wasm@1.0.0/dist/n64wasm.min.js"></script>
     <script>
         // --- Tab Logic ---
         document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -288,6 +326,10 @@
                 document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
                 this.classList.add('active');
                 document.getElementById(this.dataset.tab).classList.add('active');
+                // Show correct controller for NES/N64
+                document.body.classList.remove('nes-active', 'n64-active');
+                if (this.dataset.tab === 'nes-tab') document.body.classList.add('nes-active');
+                if (this.dataset.tab === 'n64-tab') document.body.classList.add('n64-active');
             });
         });
 
@@ -300,28 +342,51 @@
             GAMES: [
                 { id: 'Super Mario Bros. (USA)', name: 'Super Mario Bros.', rom: 'supermariobrothers.nes' },
                 { id: 'Mega Man 2 (USA)', name: 'Mega Man 2', rom: 'megaman2.nes' },
-                { id: "Mike Tyson's Punch-Out!!", name: "Mike Tyson's Punch-Out!!", rom: "miketyson'spunchout.nes" },
+                { id: "Mike Tyson's Punch-Out!!", name: "Mike Tyson's Punch-Out!!", rom: "miketysonspunchout.nes" },
                 { id: 'Contra (USA)', name: 'Contra', rom: 'contra.nes' },
                 { id: 'Battletoads (USA)', name: 'Battletoads', rom: 'battletoads.nes'},
                 { id: 'Super Mario Bros. 3 (USA)', name: 'Super Mario Bros. 3', rom: 'supermariobrothers3.nes'},
                 { id: 'Teenage Mutant Ninja Turtles (USA)', name: 'TMNT', rom: 'teenagemutantninjaturtles.nes'},
+                { id: 'Kung Fu', name: 'Kung Fu', rom: 'kungfu.nes'},
+                { id: 'Ms. Pac-Man', name: 'Ms. Pac-Man', rom: 'mspacman.nes'},
+                { id: 'Pro Wrestling', name: 'Pro Wrestling', rom: 'prowrestling.nes'},
+                { id: 'Super Mario Bros. 2', name: 'Super Mario Bros. 2', rom: 'supermariobrothers2.nes'},
+                { id: 'Super Spike V\'Ball', name: 'Super Spike V\'Ball', rom: 'superspikev-ballworldcup.nes'},
+                { id: 'Tag Team Pro Wrestling', name: 'Tag Team Pro Wrestling', rom: 'tagteamprowrestling.nes'},
+                { id: 'Tecmo Super Bowl', name: 'Tecmo Super Bowl', rom: 'tecmosuperbowl.nes'},
+                { id: 'TMNT 2', name: 'TMNT 2', rom: 'teenagemutantninjaturtles2.nes'},
+                { id: 'TMNT 3', name: 'TMNT 3', rom: 'teenagemutantninjaturtles3.nes'},
+                { id: 'WCW Wrestling', name: 'WCW Wrestling', rom: 'wcwworldchampionshipwrestling.nes'},
+                { id: 'WWF Wrestlemania', name: 'WWF Wrestlemania', rom: 'wrestlemania.nes'}
             ],
             N64_GAMES: [
-                { id: 'Super Mario 64 (USA)', name: 'Super Mario 64', rom: 'supermario64.z64' },
-                { id: 'The Legend of Zelda - Ocarina of Time (USA)', name: 'Zelda: Ocarina of Time', rom: 'zeldaoot.z64' },
-                { id: 'Mario Kart 64 (USA)', name: 'Mario Kart 64', rom: 'mariokart64.z64' },
-                { id: 'GoldenEye 007 (USA)', name: 'GoldenEye 007', rom: 'goldeneye007.z64' },
-                { id: 'Star Fox 64 (USA)', name: 'Star Fox 64', rom: 'starfox64.z64' },
+                { id: 'GoldenEye 007', name: 'GoldenEye 007', rom: 'GoldenEye 007 (USA).z64' },
+                { id: 'Mario Kart 64', name: 'Mario Kart 64', rom: 'Mario Kart 64 (USA).z64' },
+                { id: 'Paper Mario', name: 'Paper Mario', rom: 'Paper Mario (USA).z64' },
+                { id: 'Super Mario 64', name: 'Super Mario 64', rom: 'Super Mario 64 (USA).z64' },
+                { id: 'WWF No Mercy Plus', name: 'WWF No Mercy Plus', rom: 'WWF No Mercy Plus (v2.1).z64' }
             ],
             KEY_MAP: { 38: 1, 40: 2, 37: 3, 39: 4, 88: 5, 90: 6, 16: 7, 13: 8 },
             BUTTON_MAP: { 1: jsnes.Controller.BUTTON_UP, 2: jsnes.Controller.BUTTON_DOWN, 3: jsnes.Controller.BUTTON_LEFT, 4: jsnes.Controller.BUTTON_RIGHT, 5: jsnes.Controller.BUTTON_A, 6: jsnes.Controller.BUTTON_B, 7: jsnes.Controller.BUTTON_SELECT, 8: jsnes.Controller.BUTTON_START },
             nes: null,
             audioCtx: null,
+            audioNode: null,
             isPoweredOn: false,
             animationFrameId: null,
             currentGame: null,
             isControllerEnabled: true,
             elements: {},
+            n64: null,
+            n64IsPoweredOn: false,
+            n64CurrentGame: null,
+            n64AnimationFrameId: null,
+            n64Module: null,
+            n64AudioNode: null,
+            n64AudioCtx: null,
+            n64GamepadPrev: [],
+            n64Canvas: null,
+            n64Status: null,
+            n64PowerLight: null,
             init() {
                 this.elements = {
                     body: document.body,
@@ -335,19 +400,28 @@
                     errorMessage: document.getElementById('error-message'),
                     closeModalBtn: document.getElementById('close-modal-btn'),
                     mobileController: document.getElementById('mobile-controller'),
+                    mobileControllerN64: document.getElementById('mobile-controller-n64'),
                     toggleControllerBtn: document.getElementById('toggle-controller-btn'),
                     n64CartridgeContainer: document.getElementById('n64-cartridge-container'),
+                    n64ScreenOverlay: document.getElementById('n64-screen-overlay'),
                 };
+                this.n64Canvas = document.getElementById('n64-screen');
+                this.n64Status = document.getElementById('n64-status');
+                this.n64PowerLight = document.getElementById('n64-power-light');
                 this.populateCartridges();
                 this.populateN64Cartridges();
                 this.setupEventListeners();
                 this.updateControllerState(true);
+                this.setupGamepad();
+                this.setupN64Gamepad();
+                document.body.classList.add('nes-active');
             },
             setupEventListeners() {
                 this.elements.closeModalBtn.addEventListener('click', () => this.elements.errorModal.classList.add('hidden'));
                 this.elements.powerButton.addEventListener('click', () => this.isPoweredOn ? this.powerOff() : this.powerOn());
                 this.elements.toggleControllerBtn.addEventListener('click', () => this.updateControllerState(!this.isControllerEnabled));
                 this.setupControllerInputs();
+                this.setupN64TouchController();
             },
             updateControllerState(isEnabled) {
                 this.isControllerEnabled = isEnabled;
@@ -380,22 +454,27 @@
                         <img src="${this.COVER_FOLDER()}${game.id}.png" alt="${game.name}" class="n64-game-cover" onerror="this.onerror=null;this.src='https://placehold.co/120x80/222222/FFFFFF?text=${encodeURIComponent(game.name)}';">
                         <div class="n64-cartridge-label">${game.name}</div>
                     `;
-                    // No click handler yet (WIP)
+                    cartElement.addEventListener('click', () => this.loadN64Game(game));
                     this.elements.n64CartridgeContainer.appendChild(cartElement);
                 });
             },
             // --- Audio & Power Logic ---
             initAudio() {
-                if (this.audioCtx) return;
+                if (this.audioCtx && this.audioNode) return;
                 try {
                     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const scriptNode = this.audioCtx.createScriptProcessor(4096, 1, 1);
-                    scriptNode.onaudioprocess = (e) => {
-                        if (!this.isPoweredOn || !this.nes) return;
+                    this.audioNode = this.audioCtx.createScriptProcessor(2048, 1, 1);
+                    this.audioNode.onaudioprocess = (e) => {
+                        if (!this.isPoweredOn || !this.nes) {
+                            // Silence output
+                            let out = e.outputBuffer.getChannelData(0);
+                            for (let i = 0; i < out.length; i++) out[i] = 0;
+                            return;
+                        }
                         const buffer = e.outputBuffer.getChannelData(0);
                         this.nes.audio.getSamples(buffer, buffer.length);
                     };
-                    scriptNode.connect(this.audioCtx.destination);
+                    this.audioNode.connect(this.audioCtx.destination);
                 } catch (e) {
                     console.error("Web Audio API is not supported in this browser or could not be initialized.", e);
                 }
@@ -406,6 +485,8 @@
                 this.elements.powerLight.classList.add('on');
                 this.elements.body.classList.add('game-active');
                 this.updateStatus(`Now Playing: ${this.currentGame.name}`);
+                this.elements.screenOverlay.style.display = 'none';
+                if (this.audioCtx && this.audioCtx.state === 'suspended') this.audioCtx.resume();
                 const gameLoop = () => {
                     if (!this.isPoweredOn) return;
                     this.nes.frame();
@@ -421,6 +502,13 @@
                 this.elements.powerLight.classList.remove('on');
                 this.elements.body.classList.remove('game-active');
                 this.updateStatus('System is off. Select a game.');
+                // Remove game and show splash
+                this.currentGame = null;
+                document.querySelectorAll('.cartridge-wrapper.selected').forEach(el => el.classList.remove('selected'));
+                this.elements.screenOverlay.style.backgroundImage = `url('${this.ASSET_FOLDER()}Splash/NES.png')`;
+                this.elements.screenOverlay.style.display = 'block';
+                // Silence audio
+                if (this.audioCtx && this.audioCtx.state === 'running') this.audioCtx.suspend();
             },
             // --- Game Loading ---
             async loadGame(game) {
@@ -481,21 +569,201 @@
                 }
             },
             setupControllerInputs() {
-                document.addEventListener('keydown', e => { if (this.KEY_MAP[e.keyCode]) { e.preventDefault(); this.handleButton(true, e.keyCode); } });
-                document.addEventListener('keyup', e => { if (this.KEY_MAP[e.keyCode]) { e.preventDefault(); this.handleButton(false, e.keyCode); } });
+                // Keyboard
+                document.addEventListener('keydown', e => {
+                    if (this.KEY_MAP[e.keyCode]) {
+                        e.preventDefault();
+                        this.handleButton(true, e.keyCode);
+                    }
+                });
+                document.addEventListener('keyup', e => {
+                    if (this.KEY_MAP[e.keyCode]) {
+                        e.preventDefault();
+                        this.handleButton(false, e.keyCode);
+                    }
+                });
+                // Touch
                 this.elements.mobileController.querySelectorAll('.touch-button').forEach(button => {
                     const keyCode = button.dataset.key;
                     const handle = (isDown, e) => {
                         e.preventDefault();
                         button.classList.toggle('active', isDown);
-                        this.handleButton(isDown, keyCode);
+                        this.handleButton(isDown, parseInt(keyCode));
                     };
                     button.addEventListener('touchstart', (e) => handle(true, e), { passive: false });
                     button.addEventListener('touchend', (e) => handle(false, e), { passive: false });
                 });
             },
+            // --- N64 Section ---
+            async loadN64Game(game) {
+                if (this.n64CurrentGame?.id === game.id) {
+                    this.n64PowerOn();
+                    return;
+                }
+                this.n64PowerOff();
+                this.n64CurrentGame = game;
+                document.querySelectorAll('.n64-cartridge-wrapper.selected').forEach(el => el.classList.remove('selected'));
+                document.querySelector(`[data-game-id="${game.id}"]`).classList.add('selected');
+                this.n64Status.innerHTML = `<span class="inline-block bg-sky-900 text-sky-300 px-4 py-2 rounded shadow">Loading ${game.name}...</span>`;
+                this.n64PowerLight.classList.remove('on');
+                this.elements.n64ScreenOverlay.style.backgroundImage = `url('${this.ASSET_FOLDER()}Splash/Nintendo.png')`;
+                this.elements.n64ScreenOverlay.style.display = 'block';
+                try {
+                    if (!window.N64Wasm) {
+                        this.showError('N64Wasm failed to load. Please check your connection.');
+                        return;
+                    }
+                    // Fetch ROM
+                    const romUrl = this.ROM_FOLDER() + game.rom;
+                    const response = await fetch(romUrl);
+                    if (!response.ok) throw new Error(`ROM not found (HTTP ${response.status})`);
+                    const arrayBuffer = await response.arrayBuffer();
+                    // Initialize N64Wasm if not already
+                    if (!this.n64Module) {
+                        this.n64Module = await N64Wasm({
+                            canvas: this.n64Canvas,
+                            onReady: () => {},
+                            onError: (msg) => this.showError(msg)
+                        });
+                    }
+                    // Reset emulator state
+                    this.n64Module.reset();
+                    // Load ROM
+                    await this.n64Module.loadROM(arrayBuffer);
+                    this.elements.n64ScreenOverlay.style.display = 'none';
+                    this.n64PowerOn();
+                } catch (error) {
+                    console.error('Error loading N64 ROM:', error);
+                    this.showError(`Failed to load ${game.name}. The file might be missing or corrupted.`);
+                    this.n64PowerOff();
+                    this.n64CurrentGame = null;
+                    document.querySelector(`[data-game-id="${game.id}"]`).classList.remove('selected');
+                    this.elements.n64ScreenOverlay.style.backgroundImage = `url('${this.ASSET_FOLDER()}Splash/N64.png')`;
+                }
+            },
+            n64PowerOn() {
+                if (this.n64IsPoweredOn || !this.n64CurrentGame || !this.n64Module) return;
+                this.n64IsPoweredOn = true;
+                this.n64PowerLight.classList.add('on');
+                this.n64Status.innerHTML = `<span class="inline-block bg-green-900 text-green-300 px-4 py-2 rounded shadow">Now Playing: ${this.n64CurrentGame.name}</span>`;
+                this.elements.n64ScreenOverlay.style.display = 'none';
+                this.n64Module.resume();
+                // Start animation loop if needed
+                const loop = () => {
+                    if (!this.n64IsPoweredOn) return;
+                    if (this.n64Module && this.n64Module._mainLoop) this.n64Module._mainLoop();
+                    this.n64AnimationFrameId = window.requestAnimationFrame(loop);
+                };
+                loop();
+            },
+            n64PowerOff() {
+                if (!this.n64IsPoweredOn) return;
+                this.n64IsPoweredOn = false;
+                if (this.n64AnimationFrameId) window.cancelAnimationFrame(this.n64AnimationFrameId);
+                this.n64AnimationFrameId = null;
+                this.n64PowerLight.classList.remove('on');
+                this.n64Status.innerHTML = `<span class="inline-block bg-sky-900 text-sky-300 px-4 py-2 rounded shadow">Select a cartridge to power on the N64!</span>`;
+                this.elements.n64ScreenOverlay.style.backgroundImage = `url('${this.ASSET_FOLDER()}Splash/N64.png')`;
+                this.elements.n64ScreenOverlay.style.display = 'block';
+                if (this.n64Module) this.n64Module.pause();
+            },
+            // --- N64 Touch Controller ---
+            setupN64TouchController() {
+                // N64Wasm key mapping
+                const N64_KEY_MAP = {
+                    'ArrowUp': 'DPAD_UP',
+                    'ArrowDown': 'DPAD_DOWN',
+                    'ArrowLeft': 'DPAD_LEFT',
+                    'ArrowRight': 'DPAD_RIGHT',
+                    'KeyA': 'A',
+                    'KeyB': 'B',
+                    'KeyC': 'C_UP', // We'll use C_UP for demo
+                    'Enter': 'START',
+                    'KeyZ': 'Z'
+                };
+                this.elements.mobileControllerN64.querySelectorAll('.touch-button').forEach(button => {
+                    const keyCode = button.dataset.key;
+                    const handle = (isDown, e) => {
+                        e.preventDefault();
+                        button.classList.toggle('active', isDown);
+                        if (this.n64IsPoweredOn && this.n64Module && N64_KEY_MAP[keyCode]) {
+                            this.n64Module.setButton(0, N64_KEY_MAP[keyCode], isDown);
+                        }
+                    };
+                    button.addEventListener('touchstart', (e) => handle(true, e), { passive: false });
+                    button.addEventListener('touchend', (e) => handle(false, e), { passive: false });
+                });
+            },
+            // --- N64 Gamepad Support ---
+            setupN64Gamepad() {
+                const N64_GAMEPAD_MAP = [
+                    { btn: 12, key: 'DPAD_UP' },    // D-Pad Up
+                    { btn: 13, key: 'DPAD_DOWN' },  // D-Pad Down
+                    { btn: 14, key: 'DPAD_LEFT' },  // D-Pad Left
+                    { btn: 15, key: 'DPAD_RIGHT' }, // D-Pad Right
+                    { btn: 0, key: 'A' },           // A
+                    { btn: 1, key: 'B' },           // B
+                    { btn: 8, key: 'START' },       // Start
+                    { btn: 6, key: 'Z' },           // Z (L2)
+                    { btn: 2, key: 'C_UP' },        // X -> C-Up
+                    { btn: 3, key: 'C_RIGHT' },     // Y -> C-Right
+                    { btn: 4, key: 'C_LEFT' },      // L1 -> C-Left
+                    { btn: 5, key: 'C_DOWN' }       // R1 -> C-Down
+                ];
+                const pollGamepad = () => {
+                    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+                    if (gamepads[0] && this.n64IsPoweredOn && this.n64Module) {
+                        const gp = gamepads[0];
+                        N64_GAMEPAD_MAP.forEach(({btn, key}) => {
+                            const pressed = gp.buttons[btn] && gp.buttons[btn].pressed;
+                            if (pressed && !this.n64GamepadPrev[btn]) this.n64Module.setButton(0, key, true);
+                            if (!pressed && this.n64GamepadPrev[btn]) this.n64Module.setButton(0, key, false);
+                            this.n64GamepadPrev[btn] = pressed;
+                        });
+                        // Analog stick (left stick)
+                        if (gp.axes && gp.axes.length >= 2) {
+                            // N64 analog stick: -1 to 1, map to -80 to 80
+                            const x = Math.round(gp.axes[0] * 80);
+                            const y = Math.round(gp.axes[1] * 80);
+                            this.n64Module.setAnalog(0, x, y);
+                        }
+                    }
+                    requestAnimationFrame(pollGamepad);
+                };
+                pollGamepad();
+            },
+            // --- NES Gamepad Support ---
+            setupGamepad() {
+                let prevButtons = [];
+                const pollGamepad = () => {
+                    const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+                    if (gamepads[0]) {
+                        const gp = gamepads[0];
+                        // NES mapping: D-Pad, A, B, Select, Start
+                        const mapping = [
+                            { btn: 12, key: 38 }, // Up
+                            { btn: 13, key: 40 }, // Down
+                            { btn: 14, key: 37 }, // Left
+                            { btn: 15, key: 39 }, // Right
+                            { btn: 1, key: 88 },  // A button -> X
+                            { btn: 0, key: 90 },  // B button -> A
+                            { btn: 8, key: 16 },  // Select
+                            { btn: 9, key: 13 },  // Start
+                        ];
+                        mapping.forEach(({btn, key}) => {
+                            if (gp.buttons[btn]) {
+                                if (gp.buttons[btn].pressed && !prevButtons[btn]) this.handleButton(true, key);
+                                if (!gp.buttons[btn].pressed && prevButtons[btn]) this.handleButton(false, key);
+                                prevButtons[btn] = gp.buttons[btn].pressed;
+                            }
+                        });
+                    }
+                    requestAnimationFrame(pollGamepad);
+                };
+                pollGamepad();
+            }
         };
-        document.addEventListener('DOMContentLoaded', () => RetroRewind.init());
+        RetroRewind.init();
     </script>
 </body>
 </html>
