@@ -10,40 +10,103 @@
         body { font-family: 'Press Start 2P', cursive; background-color: #1a1a1a; color: #e0e0e0; overflow-x: hidden; -webkit-tap-highlight-color: transparent; }
         .title-glow { animation: pulse-red 3s infinite; text-shadow: 0 0 4px #ef4444, 0 0 8px #ef4444; }
         @keyframes pulse-red { 0%, 100% { text-shadow: 0 0 4px #ef4444, 0 0 8px #ef4444; } 50% { text-shadow: 0 0 6px #f87171, 0 0 12px #f87171; } }
+        
+        /* Main layout containers */
         .game-station { display: flex; flex-direction: column; align-items: center; gap: 2rem; width: 100%; }
-        @media (min-width: 1024px) { .game-station { flex-direction: row; align-items: flex-end; justify-content: center; } }
-        .tv-wrapper { background-image: url('https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/TV/Frame.png'); background-size: contain; background-repeat: no-repeat; background-position: center; position: relative; width: 90vw; max-width: 800px; aspect-ratio: 512 / 448; flex-shrink: 0; }
-        .screen-container { position: absolute; background: #000; overflow: hidden; top: 9.5%; left: 12.5%; width: 75%; height: 65%; }
-        #nes-screen { width: 100%; height: 100%; image-rendering: pixelated; image-rendering: -moz-crisp-edges; image-rendering: crisp-edges; }
-        #screen-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: contain; background-position: center; background-repeat: no-repeat; transition: background-image 0.2s; }
-        .tv-reflection { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 15%); pointer-events: none; }
-        .power-button-area { cursor: pointer; }
+        @media (min-width: 1024px) { .game-station { flex-direction: row; align-items: center; justify-content: center; } }
+
+        /* --- NEW: Custom CSS CRT TV Effect --- */
+        .tv-wrapper {
+            position: relative;
+            width: 90vw;
+            max-width: 800px;
+            padding: 2.5rem;
+            background: #282828;
+            border-radius: 1.5rem;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.7), 0 10px 20px rgba(0,0,0,0.5);
+            border: 2px solid #1a1a1a;
+        }
+        .screen-container {
+            position: relative;
+            background: #000;
+            overflow: hidden;
+            width: 100%;
+            padding-top: 75%; /* 4:3 Aspect Ratio */
+            border-radius: 1rem;
+            box-shadow: inset 0 0 25px #000;
+        }
+        #nes-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+        }
+        /* Scanline Overlay */
+        .screen-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0) 50%, rgba(0,0,0,0.2) 50%);
+            background-size: 100% 4px;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+            z-index: 2;
+        }
+        @keyframes scanline {
+            from { background-position-y: 0px; }
+            to { background-position-y: -8px; }
+        }
+
+        /* Power light and console styles */
         .power-light { width: 16px; height: 16px; border-radius: 50%; background-color: #660000; border: 2px solid #ff0000; box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); transition: all 0.3s; }
         .power-light.on { background-color: #ff0000; box-shadow: 0 0 10px #ff0000, 0 0 20px #ff0000; }
-        .cartridge-wrapper { transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out, box-shadow 0.2s; border: 2px solid transparent; border-radius: 8px; }
+        .cartridge-wrapper { transition: transform 0.2s ease-in-out, filter 0.2s ease-in-out, box-shadow 0.2s; border: 2px solid transparent; border-radius: 8px; cursor: pointer; }
         .cartridge-wrapper:hover { transform: translateY(-5px) scale(1.05); filter: drop-shadow(0 0 15px #facc15); }
-        .cartridge-wrapper.selected { border-color: #facc15; box-shadow: 0 0 20px #facc15; }
+        .cartridge-wrapper.selected { border-color: #facc15; box-shadow: 0 0 20px #facc15; transform: translateY(-5px) scale(1.05); }
         .game-cover { position: absolute; width: 78%; height: 55%; top: 10%; left: 11%; object-fit: contain; pointer-events: none; image-rendering: pixelated; }
-        #mobile-controller { background-image: url('https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Controller/NESTemplate.png'); background-size: contain; background-position: center; background-repeat: no-repeat; position: fixed; bottom: 0; left: 0; right: 0; width: 100%; height: 200px; z-index: 100; display: none; }
-        body.game-active .lg\\:hidden#mobile-controller { display: block; }
+
+        /* --- UPDATED: On-screen controller styles --- */
+        #mobile-controller {
+            background-image: url('https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Controller/NESTemplate.png');
+            background-size: contain;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: fixed;
+            bottom: 0;
+            left: 0; right: 0; width: 100%;
+            height: 200px;
+            z-index: 100;
+            display: none; /* Hidden by default */
+        }
+        /* Logic to show the controller */
+        body.controller-enabled.game-active .lg\\:hidden#mobile-controller { display: block; }
         .controller-layout { width: 100%; height: 100%; display: flex; justify-content: space-between; align-items: center; padding: 20px 5%; }
         .d-pad { position: relative; width: 120px; height: 120px; }
         .face-buttons { display: flex; gap: 20px; align-items: center; }
         .system-buttons { position: absolute; bottom: 35%; left: 50%; transform: translateX(-50%); display: flex; gap: 15px; }
-        .touch-button { position: absolute; background: rgba(255, 255, 255, 0.1); border-radius: 50%; -webkit-tap-highlight-color: rgba(255,255,255,0.5); }
+        .touch-button { position: absolute; background: rgba(255, 255, 255, 0.1); -webkit-tap-highlight-color: rgba(255,255,255,0.5); }
         .touch-button.active { background: rgba(255, 255, 255, 0.4); }
-        #dpad-up { top: 0; left: 33.33%; width: 33.33%; height: 33.33%; border-radius: 0; }
-        #dpad-down { bottom: 0; left: 33.33%; width: 33.33%; height: 33.33%; border-radius: 0; }
-        #dpad-left { top: 33.33%; left: 0; width: 33.33%; height: 33.33%; border-radius: 0; }
-        #dpad-right { top: 33.33%; right: 0; width: 33.33%; height: 33.33%; border-radius: 0; }
-        .b-button, .a-button { width: 50px; height: 50px; }
+        #dpad-up { top: 0; left: 33.33%; width: 33.33%; height: 33.33%; border-radius: 5px 5px 0 0; }
+        #dpad-down { bottom: 0; left: 33.33%; width: 33.33%; height: 33.33%; border-radius: 0 0 5px 5px; }
+        #dpad-left { top: 33.33%; left: 0; width: 33.33%; height: 33.33%; border-radius: 5px 0 0 5px; }
+        #dpad-right { top: 33.33%; right: 0; width: 33.33%; height: 33.33%; border-radius: 0 5px 5px 0; }
+        .b-button, .a-button { width: 50px; height: 50px; border-radius: 50%; }
         .select-button, .start-button { width: 50px; height: 20px; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-gray-900 flex flex-col items-center min-h-screen p-4 pb-48 lg:pb-4">
 
     <header class="text-center mb-6">
-        <h1 class="text-4xl md:text-5xl font-bold text-red-500 tracking-wider title-glow">Retro Rewind<sup class="text-sm align-top">&trade;</sup></h1>
+        <h1 class="text-4xl md:text-5xl font-bold text-red-500 tracking-wider title-glow">
+            Retro Rewind<sup class="text-sm align-top">&trade;</sup>
+        </h1>
         <p id="status-text" class="text-gray-400 mt-2 h-6 transition-opacity">Click a cartridge to power up the system!</p>
     </header>
 
@@ -52,13 +115,12 @@
             <div class="tv-wrapper">
                 <div class="screen-container">
                     <canvas id="nes-screen" width="256" height="240"></canvas>
-                    <div id="screen-overlay"></div>
-                    <div class="tv-reflection"></div>
+                    <div id="screen-overlay" style="background-image: url('https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Splash/NES.png');"></div>
                 </div>
             </div>
-            <div id="console-area" class="w-full max-w-xs md:max-w-sm lg:max-w-xs flex-shrink-0">
+            <div id="console-area" class="w-full max-w-xs md:max-w-sm lg:max-w-xs flex-shrink-0 mt-8 lg:mt-0">
                 <img src="https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/Console/NES.png" alt="NES Console" class="w-full h-auto">
-                <div id="power-button" class="power-button-area flex items-center gap-4 p-4 justify-center mt-[-10px]">
+                <div id="power-button" class="power-button-area flex items-center gap-4 p-4 justify-center mt-[-10px] cursor-pointer">
                     <div class="power-light" id="power-light"></div>
                     <div class="text-gray-400 font-sans text-sm">POWER</div>
                 </div>
@@ -66,20 +128,17 @@
         </div>
 
         <section id="game-selection" class="w-full mt-12 p-4">
-            <h2 class="text-2xl text-center mb-6 border-b-2 border-gray-700 pb-2">Game Library</h2>
+            <div class="flex justify-between items-center mb-6 border-b-2 border-gray-700 pb-2">
+                 <h2 class="text-2xl">Game Library</h2>
+                 <button id="toggle-controller-btn" class="text-xs bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded lg:hidden">
+                    On-Screen Controller: ON
+                 </button>
+            </div>
             <div id="cartridge-container" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8"></div>
         </section>
-
-        <section id="controls-info" class="text-center mt-12 p-4 bg-gray-800/50 rounded-lg border border-gray-700 w-full">
-            <h3 class="text-xl mb-4">Controls</h3>
-            <img src="https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/assets/ControllerDiagrams/Color/DiagramText.png" alt="Controller Diagram" class="mx-auto mb-4 max-w-full h-auto px-4" style="max-width: 400px;">
-            <p class="mt-4 text-xs text-gray-400">Keyboard: Arrows, X (A), Z (B), Enter (Start), Shift (Select). Gamepad also supported.</p>
-        </section>
     </main>
-
-    <footer class="text-center text-gray-500 text-sm mt-8 pb-4">
-        <p>SkyeDev &lt;3</p>
-    </footer>
+    
+    <footer class="text-center text-gray-500 text-sm mt-8 pb-4">SkyeDev &lt;3</footer>
 
     <div id="mobile-controller" class="lg:hidden">
         <div class="controller-layout">
@@ -106,7 +165,6 @@
 
     <script src="https://unpkg.com/jsnes/dist/jsnes.min.js"></script>
     <script>
-        // --- IMPROVEMENT: Encapsulate the entire application in a single object to avoid polluting the global scope.
         const RetroRewind = {
             // --- Configuration ---
             GITHUB_BASE_URL: 'https://raw.githubusercontent.com/oxyisbad222/retrorewind/main/',
@@ -116,17 +174,11 @@
             GAMES: [
                 { id: 'Super Mario Bros. (USA)', name: 'Super Mario Bros.', rom: 'supermariobrothers.nes' },
                 { id: 'Mega Man 2 (USA)', name: 'Mega Man 2', rom: 'megaman2.nes' },
-                { id: 'Ms. Pac-Man (USA)', name: 'Ms. Pac-Man', rom: 'mspacman.nes' },
                 { id: "Mike Tyson's Punch-Out!!", name: "Mike Tyson's Punch-Out!!", rom: "miketyson'spunchout.nes" },
                 { id: 'Contra (USA)', name: 'Contra', rom: 'contra.nes' },
                 { id: 'Battletoads (USA)', name: 'Battletoads', rom: 'battletoads.nes'},
-                { id: 'Kung Fu (USA)', name: 'Kung Fu', rom: 'kungfu.nes'},
-                { id: 'Mega Man (USA)', name: 'Mega Man', rom: 'megaman.nes'},
-                { id: 'Super Mario Bros. 2 (USA)', name: 'Super Mario Bros. 2', rom: 'supermariobrothers2.nes'},
                 { id: 'Super Mario Bros. 3 (USA)', name: 'Super Mario Bros. 3', rom: 'supermariobrothers3.nes'},
                 { id: 'Teenage Mutant Ninja Turtles (USA)', name: 'TMNT', rom: 'teenagemutantninjaturtles.nes'},
-                { id: 'Teenage Mutant Ninja Turtles II (USA)', name: 'TMNT II', rom: 'teenagemutantninjaturtles2.nes'},
-                { id: 'Teenage Mutant Ninja Turtles III (USA)', name: 'TMNT III', rom: 'teenagemutantninjaturtles3.nes'}
             ],
             KEY_MAP: { 38: 1, 40: 2, 37: 3, 39: 4, 88: 5, 90: 6, 16: 7, 13: 8 },
             BUTTON_MAP: { 1: jsnes.Controller.BUTTON_UP, 2: jsnes.Controller.BUTTON_DOWN, 3: jsnes.Controller.BUTTON_LEFT, 4: jsnes.Controller.BUTTON_RIGHT, 5: jsnes.Controller.BUTTON_A, 6: jsnes.Controller.BUTTON_B, 7: jsnes.Controller.BUTTON_SELECT, 8: jsnes.Controller.BUTTON_START },
@@ -137,11 +189,10 @@
             isPoweredOn: false,
             animationFrameId: null,
             currentGame: null,
+            isControllerEnabled: true, // Controller state
             
-            // --- DOM Elements ---
-            elements: {},
+            elements: {}, // To be populated in init()
 
-            // --- Initialization ---
             init() {
                 // Cache DOM elements
                 this.elements = {
@@ -156,26 +207,28 @@
                     errorMessage: document.getElementById('error-message'),
                     closeModalBtn: document.getElementById('close-modal-btn'),
                     mobileController: document.getElementById('mobile-controller'),
+                    toggleControllerBtn: document.getElementById('toggle-controller-btn'),
                 };
                 
                 this.populateCartridges();
-                this.setScreenOverlay(this.ASSET_FOLDER() + 'Splash/NES.png');
-                this.elements.closeModalBtn.addEventListener('click', () => this.elements.errorModal.classList.add('hidden'));
-                
-                // --- IMPROVEMENT: Power button now correctly toggles power.
-                this.elements.powerButton.addEventListener('click', () => {
-                    if (this.isPoweredOn) {
-                        this.powerOff();
-                    } else if (this.currentGame) {
-                        this.powerOn();
-                    }
-                });
-                
-                this.setupControllerEvents();
+                this.setupEventListeners();
+                this.updateControllerState(true);
                 console.log("Retro Rewind Initialized!");
             },
 
-            // --- UI Functions ---
+            setupEventListeners() {
+                this.elements.closeModalBtn.addEventListener('click', () => this.elements.errorModal.classList.add('hidden'));
+                this.elements.powerButton.addEventListener('click', () => this.isPoweredOn ? this.powerOff() : this.powerOn());
+                this.elements.toggleControllerBtn.addEventListener('click', () => this.updateControllerState(!this.isControllerEnabled));
+                this.setupControllerInputs();
+            },
+
+            updateControllerState(isEnabled) {
+                this.isControllerEnabled = isEnabled;
+                this.elements.body.classList.toggle('controller-enabled', isEnabled);
+                this.elements.toggleControllerBtn.textContent = `On-Screen Controller: ${isEnabled ? 'ON' : 'OFF'}`;
+            },
+
             populateCartridges() {
                 this.elements.cartridgeContainer.innerHTML = '';
                 this.GAMES.forEach(game => {
@@ -192,46 +245,30 @@
                 });
             },
 
-            setScreenOverlay(imageUrl, text = null) {
-                this.elements.screenOverlay.style.backgroundImage = imageUrl ? `url('${imageUrl}')` : '';
-                this.elements.screenOverlay.style.display = imageUrl ? 'block' : 'none';
-                if (text) this.updateStatus(text);
-            },
-            
-            updateStatus(text) {
-                this.elements.statusText.textContent = text;
-            },
-
-            showError(message) {
-                this.elements.errorMessage.textContent = message;
-                this.elements.errorModal.classList.remove('hidden');
-            },
-
-            // --- Audio & Power ---
+            // --- Audio & Power Logic ---
             initAudio() {
-                if (!this.audioCtx) {
+                if (this.audioCtx) return;
+                try {
                     this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     const scriptNode = this.audioCtx.createScriptProcessor(4096, 1, 1);
-                    // NOTE: createScriptProcessor is deprecated but required by this version of jsnes.
                     scriptNode.onaudioprocess = (e) => {
                         if (!this.isPoweredOn || !this.nes) return;
                         const buffer = e.outputBuffer.getChannelData(0);
                         this.nes.audio.getSamples(buffer, buffer.length);
                     };
                     scriptNode.connect(this.audioCtx.destination);
+                } catch (e) {
+                    console.error("Web Audio API is not supported in this browser or could not be initialized.", e);
                 }
             },
             
             powerOn() {
                 if (this.isPoweredOn || !this.currentGame) return;
-                console.log('Powering on...');
                 this.isPoweredOn = true;
                 this.elements.powerLight.classList.add('on');
                 this.elements.body.classList.add('game-active');
-                this.setScreenOverlay(null, `Now Playing: ${this.currentGame.name}`);
+                this.updateStatus(`Now Playing: ${this.currentGame.name}`);
                 
-                // --- IMPROVEMENT: Switched from setInterval to requestAnimationFrame for the game loop.
-                // This provides smoother animation and better performance by syncing with the browser's repaint cycle.
                 const gameLoop = () => {
                     if (!this.isPoweredOn) return;
                     this.nes.frame();
@@ -242,78 +279,69 @@
 
             powerOff() {
                 if (!this.isPoweredOn) return;
-                console.log('Powering off...');
                 this.isPoweredOn = false;
-                
-                // --- IMPROVEMENT: Cleaner shutdown logic.
-                if (this.animationFrameId) {
-                    window.cancelAnimationFrame(this.animationFrameId);
-                    this.animationFrameId = null;
-                }
-                
+                if (this.animationFrameId) window.cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
                 this.elements.powerLight.classList.remove('on');
                 this.elements.body.classList.remove('game-active');
-                this.setScreenOverlay(this.ASSET_FOLDER() + 'Splash/NES.png', 'System is off. Select a game.');
+                this.updateStatus('System is off. Select a game.');
             },
 
-            // --- Emulator Logic ---
+            // --- Game Loading ---
             async loadGame(game) {
-                if (this.currentGame?.id === game.id && this.isPoweredOn) return; // Don't reload the same game if it's running
+                if (this.currentGame?.id === game.id) {
+                    this.powerOn(); // If same game is selected, just power it on.
+                    return;
+                }
                 
                 this.powerOff();
                 this.currentGame = game;
                 
-                // --- IMPROVEMENT: Visual feedback for selected cartridge.
                 document.querySelectorAll('.cartridge-wrapper.selected').forEach(el => el.classList.remove('selected'));
                 document.querySelector(`[data-game-id="${game.id}"]`).classList.add('selected');
 
                 this.initAudio();
                 const romUrl = this.ROM_FOLDER() + game.rom;
                 this.updateStatus(`Loading ${game.name}...`);
-                this.setScreenOverlay(this.ASSET_FOLDER() + 'Splash/Nintendo.png');
+                this.elements.screenOverlay.style.backgroundImage = `url('${this.ASSET_FOLDER()}Splash/Nintendo.png')`;
+                this.elements.screenOverlay.style.display = 'block';
 
                 try {
                     const response = await fetch(romUrl);
                     if (!response.ok) throw new Error(`ROM not found (HTTP ${response.status})`);
-                    const arrayBuffer = await response.arrayBuffer();
                     
-                    const bytes = new Uint8Array(arrayBuffer);
-                    let binary = '';
-                    for (let i = 0; i < bytes.length; i++) {
-                        binary += String.fromCharCode(bytes[i]);
-                    }
+                    const romData = await response.text(); // JSNES requires a binary string
+                    
+                    const context = this.elements.canvas.getContext('2d');
+                    const imageData = context.createImageData(256, 240);
+                    const a32 = new Uint32Array(imageData.data.buffer);
 
-                    this.startGame(binary);
+                    this.nes = new jsnes.NES({
+                        onFrame: (frameBuffer) => {
+                            for (let i = 0; i < frameBuffer.length; i++) a32[i] = 0xFF000000 | frameBuffer[i];
+                            context.putImageData(imageData, 0, 0);
+                        },
+                        sampleRate: this.audioCtx?.sampleRate || 44100
+                    });
+                    
+                    this.nes.loadROM(romData);
+                    this.elements.screenOverlay.style.display = 'none'; // Hide overlay before starting
+                    this.powerOn();
+                    
                 } catch (error) {
                     console.error('Error loading the ROM:', error);
                     this.showError(`Failed to load ${game.name}. The file might be missing or corrupted.`);
                     this.powerOff();
-                    this.currentGame = null; // Clear current game on failure
+                    this.currentGame = null;
                     document.querySelector(`[data-game-id="${game.id}"]`).classList.remove('selected');
+                    this.elements.screenOverlay.style.backgroundImage = `url('${this.ASSET_FOLDER()}Splash/NES.png')`;
                 }
             },
 
-            startGame(romData) {
-                const context = this.elements.canvas.getContext('2d');
-                const imageData = context.createImageData(256, 240);
-                const a32 = new Uint32Array(imageData.data.buffer);
+            updateStatus(text) { this.elements.statusText.textContent = text; },
+            showError(message) { this.elements.errorMessage.textContent = message; this.elements.errorModal.classList.remove('hidden'); },
 
-                this.nes = new jsnes.NES({
-                    onFrame: (frameBuffer) => {
-                        for (let i = 0; i < frameBuffer.length; i++) {
-                            a32[i] = 0xFF000000 | frameBuffer[i];
-                        }
-                        context.putImageData(imageData, 0, 0);
-                    },
-                    sampleRate: this.audioCtx.sampleRate 
-                });
-                
-                this.nes.loadROM(romData);
-                this.powerOn();
-                this.elements.canvas.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            },
-
-            // --- Controller Logic ---
+            // --- Controller Input Logic ---
             handleButton(isDown, keyCode) {
                 if (!this.isPoweredOn || !this.nes) return;
                 const key = this.KEY_MAP[keyCode];
@@ -324,7 +352,7 @@
                 }
             },
 
-            setupControllerEvents() {
+            setupControllerInputs() {
                 // Keyboard
                 document.addEventListener('keydown', e => { if (this.KEY_MAP[e.keyCode]) { e.preventDefault(); this.handleButton(true, e.keyCode); } });
                 document.addEventListener('keyup', e => { if (this.KEY_MAP[e.keyCode]) { e.preventDefault(); this.handleButton(false, e.keyCode); } });
@@ -339,12 +367,10 @@
                     };
                     button.addEventListener('touchstart', (e) => handle(true, e), { passive: false });
                     button.addEventListener('touchend', (e) => handle(false, e), { passive: false });
-                    button.addEventListener('contextmenu', (e) => e.preventDefault());
                 });
             },
         };
 
-        // --- RUN ---
         document.addEventListener('DOMContentLoaded', () => RetroRewind.init());
     </script>
 </body>
